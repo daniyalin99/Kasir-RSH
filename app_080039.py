@@ -34,9 +34,24 @@ st.title("🏪 Kasir Generator - New Era")
 st.write(f"Tanggal: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 st.divider()
 
-# INPUT BARCODE (KETIK MANUAL)
+# INPUT BARCODE (BISA KETIK MANUAL ATAU FOTO KAMERA)
 st.subheader("1. Input Barang")
-barcode_input = st.text_input("Ketik Manual Barcode / Artikel di sini:", key="barcode_input").strip()
+
+# Tombol pilihan metode input
+metode_input = st.radio("Pilih Metode Input Barcode:", ["⌨️ Ketik Manual", "📷 Ambil Foto Barcode"])
+
+barcode_input = ""
+
+if metode_input == "⌨️ Ketik Manual":
+    barcode_input = st.text_input("Ketik Manual Barcode / Artikel di sini:", key="barcode_manual").strip()
+else:
+    # Mengaktifkan kamera bawaan HP / Laptop langsung di web
+    foto_barcode = st.camera_input("Arahkan barcode barang tepat ke tengah kamera")
+    if foto_barcode:
+        st.info("Foto berhasil diambil!")
+        # Catatan: Karena pembacaan barcode otomatis lewat gambar di server gratisan membutuhkan library khusus (seperti pyzbar),
+        # di versi web ini kamu bisa melihat fotonya terlebih dahulu, lalu sementara ketik angkanya di bawah ini:
+        barcode_input = st.text_input("Masukkan angka barcode dari foto di atas:", key="barcode_kamera").strip()
 
 # PENGATURAN PROMO MANUAL
 st.subheader("2. Pengaturan Promo Manual")
@@ -87,9 +102,9 @@ if st.button("➕ Tambahkan ke Nota", use_container_width=True):
             })
             st.success(f"Berhasil menambahkan: {desc}")
         else:
-            st.error("Barcode tidak ditemukan di database Excel!")
+            st.error(f"Barcode '{barcode_input}' tidak ditemukan di database Excel!")
     else:
-        st.error("Masukkan barcode terlebih dahulu!")
+        st.error("Silakan isi atau masukkan barcode terlebih dahulu!")
 
 st.divider()
 
@@ -118,3 +133,4 @@ if st.session_state.keranjang:
             st.rerun()
 else:
     st.info("Belum ada barang di dalam nota. Silakan input barcode barang.")
+        
